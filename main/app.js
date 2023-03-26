@@ -6,6 +6,7 @@ const fileupload = require('express-fileupload');
 
 const { addReview } = require('./databases/methods/client/ReviewDB');
 const categoryRouter = require('./routes/admin/CategoryRoute');
+const downloadRouter = require('./routes/admin/DownloadRoute');
 
 const PORT = 3050;
 
@@ -20,7 +21,13 @@ app.use(cors({
 // app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 // app.use(helmet());
-app.use(fileupload());
+app.use(fileupload({
+    createParentPath: true,
+    limits:{
+        fileSize: 1024 * 1024 * 2
+    },
+    abortOnLimit: true
+}));
 
 // const rand = Math.floor((Math.random() * 10));
 // console.log(rand );
@@ -30,6 +37,7 @@ app.use(fileupload());
 // });
 
 app.use('/category', categoryRouter);
+app.use('/download', downloadRouter);
 
 app.listen(PORT, ()=>{
     console.log('Server running on port: ',PORT);

@@ -75,11 +75,22 @@ const deleteProduct = async(productId) =>{
     return false;
 }
 
+const countProductByCategoryId = async(catId) =>{
+    try{
+        if(isConnected()){
+            const count = await productTable.countDocuments({ category_id: catId });
+            return count;
+        }
+    }catch(err){}
+    return 0;
+}
+
 module.exports = {
     addProduct,
     editProduct,
     getProductsAll,
     getProductsByGroup,
     getProductsByCategoryId,
-    deleteProduct
+    deleteProduct,
+    countProductByCategoryId
 }

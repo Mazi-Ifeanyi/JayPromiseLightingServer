@@ -1,4 +1,4 @@
-
+const SYSTEM_PATH = 'C:/Users/SAMSUNG/MY_PROJECTS/SERVER/jaypromise_server/images/'
 
 const isNull = (value) =>{
     if(value === undefined)return true;
@@ -20,6 +20,7 @@ const generateId = (length = 12) =>{
 
 
 module.exports={
+    SYSTEM_PATH,
     isNull,
     generateId
 }

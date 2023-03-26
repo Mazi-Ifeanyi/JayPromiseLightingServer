@@ -4,11 +4,18 @@ const { categoryTable, productTable } = require("../../connection/Schema");
 
 
 const addCategory = async(catName) =>{
+    let catId = null;
     try{
         if(isConnected()){
             const curDate = new Date();
-            const created = await categoryTable.create({ category_name: catName, category_id: generateId(6), createdAt: curDate, updatedAt: curDate });
-            if(!isNull(created))return created.category_id;
+            const result = await categoryTable.findOne({ category_name: catName }).select('category_id');
+            if(!isNull(result)){
+                catId = result.category_id;
+            }else {
+                catId = generateId(8);
+            }
+            const updated = await categoryTable.findOneAndUpdate({ category_name: catName },{ category_name: catName, category_id: catId, createdAt: curDate, updatedAt: curDate }, { upsert: true, new: true });
+            if(!isNull(updated))return updated.category_id;
         }
     }catch(err){
 
@@ -70,7 +77,7 @@ const deleteCategory = async(catId) =>{
             const deleted = await categoryTable.deleteOne({ category_id: catId });
             if(deleted.acknowledged && deleted.deletedCount > 0){
                 const deletedProd = await productTable.deleteMany({ category_id: catId });
-                if(deletedProd.acknowledged && deleted.deletedCount > 0)return true;
+                if(deletedProd.acknowledged && deleted.deletedCount >= 0)return true;
             }
         }
     }catch(err){
