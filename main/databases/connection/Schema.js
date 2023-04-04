@@ -64,7 +64,7 @@ const productSchema = new Schema({
     description: { type: String, required: true },
     dimension: { type: String, required: true },
     quantity: { type: Number, required: true },
-    colors: { type: Array, required: true, default: [] },
+    colors: { type: String, required: true },
     product_images: { type: Array, required: true, default: [] },
     views: { type: Number, required: false },
     group: { type: String, required: true, default: 'none' },

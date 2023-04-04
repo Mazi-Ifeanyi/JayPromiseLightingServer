@@ -7,13 +7,14 @@ const fileupload = require('express-fileupload');
 const { addReview } = require('./databases/methods/client/ReviewDB');
 const categoryRouter = require('./routes/admin/CategoryRoute');
 const downloadRouter = require('./routes/admin/DownloadRoute');
-
+const productRouter = require('./routes/admin/ProductRoute');
+const groupRouter = require('./routes/admin/GroupRoute');
 const PORT = 3050;
 
 
-const ALLOWED_ORIGINS = ['http://192.168.179.218:3001','http://localhost:3001'];
+const ALLOWED_ORIGINS = ['http://192.168.179.218:3001','http://localhost:3001','http://localhost:3000', 'http://192.168.244.18:3000'];
 app.use(cors({
-  origin: ALLOWED_ORIGINS,
+//   origin: ALLOWED_ORIGINS,
 //   allowedHeaders: ['content-type', 'authorization'],
 //   optionsSuccessStatus: 200,
 //   credentials: true
@@ -38,6 +39,8 @@ app.use(fileupload({
 
 app.use('/category', categoryRouter);
 app.use('/download', downloadRouter);
+app.use('/product', productRouter);
+app.use('/group', groupRouter);
 
 app.listen(PORT, ()=>{
     console.log('Server running on port: ',PORT);

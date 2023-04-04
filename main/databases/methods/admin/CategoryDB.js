@@ -14,8 +14,9 @@ const addCategory = async(catName) =>{
             }else {
                 catId = generateId(8);
             }
-            const updated = await categoryTable.findOneAndUpdate({ category_name: catName },{ category_name: catName, category_id: catId, createdAt: curDate, updatedAt: curDate }, { upsert: true, new: true });
-            if(!isNull(updated))return updated.category_id;
+            const updated = await categoryTable.updateOne({ category_name: catName },{ category_name: catName, category_id: catId, createdAt: curDate, updatedAt: curDate }, { upsert: true });
+            // console.log('result after updating: ',updated);
+            if(updated.acknowledged && (updated.modifiedCount > 0 || updated.upsertedCount > 0))return catId;
         }
     }catch(err){
 
@@ -24,11 +25,11 @@ const addCategory = async(catName) =>{
 }
 
 
-const updateCategory = async(categoryId, catImage) =>{
+const updateCategoryImage = async(categoryId, catImage) =>{
     try{
         if(isConnected()){
             const curDate = new Date();
-            const updated = await categoryTable.updateOne({category_id: categoryId},{ category_image: catImage, updatedAt: curDate });
+            const updated = await categoryTable.updateOne({ category_id: categoryId },{ category_image: catImage, updatedAt: curDate });
             if(updated.acknowledged && updated.modifiedCount > 0)return true;
         }
     }catch(err){
@@ -74,21 +75,21 @@ const getCategory = async() =>{
 const deleteCategory = async(catId) =>{
     try{
         if(isConnected()){
-            const deleted = await categoryTable.deleteOne({ category_id: catId });
-            if(deleted.acknowledged && deleted.deletedCount > 0){
-                const deletedProd = await productTable.deleteMany({ category_id: catId });
-                if(deletedProd.acknowledged && deleted.deletedCount >= 0)return true;
+            const result = await categoryTable.findOneAndDelete({ category_id: catId }).select('category_image -_id');
+            if(!isNull(result)){
+                productTable.deleteMany({ category_id: catId });
+                return { status: true, category_image: result.category_image };
             }
         }
     }catch(err){
 
     }
-  return false;
+  return { status: false, category_image: null };
 }
 
 module.exports ={
     addCategory,
-    updateCategory,
+    updateCategoryImage,
     editCategoryName,
     editCategoryImage,
     getCategory,

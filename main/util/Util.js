@@ -1,4 +1,4 @@
-const SYSTEM_PATH = 'C:/Users/SAMSUNG/MY_PROJECTS/SERVER/jaypromise_server/images/'
+const SYSTEM_PATH = 'C:/Users/USER/MY_PROJECTS/MY_PROJECTS/SERVER/jaypromise_server/images/';
 
 const isNull = (value) =>{
     if(value === undefined)return true;

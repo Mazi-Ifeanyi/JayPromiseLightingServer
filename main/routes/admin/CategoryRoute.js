@@ -1,6 +1,7 @@
 const express = require('express');
-const path = require('path')
-const { addCategory, updateCategory, getCategory, deleteCategory } = require('../../databases/methods/admin/CategoryDB');
+const path = require('path');
+const fs = require('fs');
+const { addCategory, updateCategoryImage, getCategory, deleteCategory } = require('../../databases/methods/admin/CategoryDB');
 const { countProductByCategoryId } = require('../../databases/methods/admin/ProductsDB');
 const { getHash } = require('../../encryption/Hashing');
 const { isNull, SYSTEM_PATH } = require('../../util/Util');
@@ -15,7 +16,7 @@ router.post('/add', async function(req, res){
     res.status(200).json({ category_id: catId });
     return;
    }
-   res.status(500).json({ category_id: null });
+   res.status(500).send('Failed to add this category.');
 });
 
 
@@ -34,14 +35,18 @@ router.post('/upload-image', function(req, res){
             return res.status(422).send('Cannot process this image');
         }
     
-        file.mv(path_, async(err)=>{
-            if(err){
-                return res.status(500).send('Failed to save image');
-            }
-            const result = await updateCategory(categoryId, fileName);
-            if(result)return res.status(200).send('Upload Successful');
-            else return res.status(500).send('Failed to save image');
-        });
+        try{
+            file.mv(path_, async(err)=>{
+                if(err){
+                    return res.status(500).send('Failed to save image');
+                }
+                const result = await updateCategoryImage(categoryId, fileName);
+                if(result)return res.status(200).send('Upload Successful');
+                else return res.status(500).send('Failed to save image');
+            });
+        }catch(err){
+            res.status(500).send('Failed to save image');
+        }
     }
    
 });
@@ -59,12 +64,18 @@ router.get('/get', async function(req, res){
     }
 });
 
-router.get('/delete', async function(req, res){
+
+router.delete('/delete', async function(req, res){
     const query = req.query;
     const catId = query.category_id;
 
     const result = await deleteCategory(catId);
-    return res.status(200).json({ result });
+    if(result.status){
+        try{
+            fs.unlinkSync(SYSTEM_PATH+result.category_image);
+        }catch(err){}
+    }
+    return res.status(200).json({ result: result.status });
 });
 
 
